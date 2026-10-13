@@ -1,5 +1,6 @@
 import os
 import time
+from logica import criar_tarefa, contar_por_estado
 
 tarefas = []
 opcoes_menu = ["Adicionar tarefa", "Listar tarefas", "Sair"]
@@ -30,11 +31,9 @@ def adicionar_tarefa():
         print("O nome da tarefa não pode ficar vazio.")
         nome = input("Nome da tarefa: ").strip()
 
-    tarefa = {
-        "nome": nome,
-        "estado": "Pendente"
-    }
+    tarefa = criar_tarefa(nome)
     tarefas.append(tarefa)
+    
     print("\nTarefa Adicionada com Sucesso!")
 
 def listar_tarefas():
@@ -47,12 +46,13 @@ def listar_tarefas():
         mostrar_linha()
         return
 
-    print(f"{'NOME':<20}{'ESTADO'}")
-    mostrar_linha()
-
     for tarefa in tarefas:
         print(f"{tarefa['nome']:<20}{tarefa['estado']}")
+    mostrar_linha()
 
+    contagem = contar_por_estado(tarefas)
+    for estado, quantidade in contagem.items():
+        print(f"{estado}: {quantidade}")
     mostrar_linha()
 
 def menu():
