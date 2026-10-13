@@ -2,10 +2,23 @@ import os
 import time
 
 tarefas = []
-estados = ["Feito", "Pendente", "Não Feito"]
+opcoes_menu = ["Adicionar tarefa", "Listar tarefas", "Sair"]
 
 def mostrar_linha():
     print("=" * 40)
+
+def limpar_tela():
+    os.system("cls" if os.name == "nt" else "clear")
+
+def pedir_opcao(mensagem, quantidade):
+    while True:
+        try:
+            opcao = int(input(f"\n{mensagem} [1-{quantidade}]: "))
+            if 1 <= opcao <= quantidade:
+                return opcao
+            print("Opção inválida. Tente novamente.")
+        except ValueError:
+            print("Digite apenas números.")
 
 def adicionar_tarefa():
     mostrar_linha()
@@ -17,25 +30,12 @@ def adicionar_tarefa():
         print("O nome da tarefa não pode ficar vazio.")
         nome = input("Nome da tarefa: ").strip()
 
-    print("\nEscolha o estado:")
-    for i, estado in enumerate(estados, start=1):
-        print(f"{i} - {estado}")
-
-    while True:
-        try:
-            opcao_estado = int(input("Digite a opção do estado [1-3]: "))
-            if 1 <= opcao_estado <= 3:
-                break
-            print("Opção inválida. Tente de novo.")
-        except ValueError:
-            print("Digite apenas números.")
-
     tarefa = {
         "nome": nome,
-        "estado": estados[opcao_estado - 1]
+        "estado": "Pendente"
     }
-    print ("\nTarefa Adicionada com Sucesso!")
     tarefas.append(tarefa)
+    print("\nTarefa Adicionada com Sucesso!")
 
 def listar_tarefas():
     mostrar_linha()
@@ -55,36 +55,31 @@ def listar_tarefas():
 
     mostrar_linha()
 
-while True:
-    os.system("cls")
-    mostrar_linha()
-    print("\tGERENCIADOR DE TAREFAS")
-    mostrar_linha()
-
-    print("\n[1] - Adicionar tarefa")
-    print("[2] - Listar tarefas")
-    print("[3] - Sair")
-
+def menu():
     while True:
-        try:
-            opcao = int(input("\nEscolha uma opção [1-3]: "))
-            if 1 <= opcao <= 3:
-                break
-            print("Opção inválida. Tente novamente.")
-        except ValueError:
-            print("Digite apenas números.")
+        limpar_tela()
+        mostrar_linha()
+        print("\tGERENCIADOR DE TAREFAS")
+        mostrar_linha()
 
-    if opcao == 1:
-        os.system ("cls")
-        adicionar_tarefa()
-        input("Pressione ENTER para voltar...")
-    elif opcao == 2:
-        os.system ("cls")
-        listar_tarefas()
-        input("\nPressione ENTER para voltar...")
-    else:
-        break
+        for i, opcao_menu in enumerate(opcoes_menu, start=1):
+            print(f"[{i}] - {opcao_menu}")
 
+        opcao = pedir_opcao("Escolha uma opção", len(opcoes_menu))
+
+        if opcao == 1:
+            limpar_tela()
+            adicionar_tarefa()
+            input("Pressione ENTER para voltar...")
+        elif opcao == 2:
+            limpar_tela()
+            listar_tarefas()
+            input("\nPressione ENTER para voltar...")
+        else:
+            limpar_tela()
+            break
+
+menu()
 print("Finalizando...")
 time.sleep(1)
 print("Volte sempre!")
