@@ -8,6 +8,9 @@ def criar_tarefa(nome):
     }
     return tarefa
 
+def atualizar_estado(tarefas, indice_tarefa, novo_estado):
+    tarefas[indice_tarefa]["estado"] = novo_estado
+
 def contar_por_estado(tarefas):
     contagem = {}
     for estado in estados:

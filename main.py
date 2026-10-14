@@ -1,9 +1,9 @@
 import os
 import time
-from logica import criar_tarefa, contar_por_estado
+from logica import criar_tarefa, contar_por_estado, estados, atualizar_estado
 
 tarefas = []
-opcoes_menu = ["Adicionar tarefa", "Listar tarefas", "Sair"]
+opcoes_menu = ["Adicionar Tarefa", "Listar Tarefas", "Mudar Estado de uma Tarefa", "Sair"]
 
 def mostrar_linha():
     print("=" * 40)
@@ -55,6 +55,30 @@ def listar_tarefas():
         print(f"{estado}: {quantidade}")
     mostrar_linha()
 
+def mudar_estado_tarefa():
+    mostrar_linha()
+    print("\tMUDAR ESTADO DA TAREFA")
+    mostrar_linha()
+
+    if not tarefas:
+        print("Não há tarefas cadastradas.")
+        mostrar_linha()
+        return
+
+    for i, tarefa in enumerate(tarefas, start=1):
+        print(f"[{i}] - {tarefa['nome']} ({tarefa['estado']})")
+
+    opcao = pedir_opcao("Escolha uma tarefa para mudar o estado", len(tarefas))
+
+    print("\nEstados disponíveis:")
+    for i, estado in enumerate(estados, start=1):
+        print(f"[{i}] - {estado}")
+
+    opcao_estado = pedir_opcao("Escolha o novo estado", len(estados))
+    atualizar_estado(tarefas, opcao - 1, estados[opcao_estado - 1])
+
+    print("\nEstado da tarefa atualizado com sucesso!")
+
 def menu():
     while True:
         limpar_tela()
@@ -70,10 +94,14 @@ def menu():
         if opcao == 1:
             limpar_tela()
             adicionar_tarefa()
-            input("Pressione ENTER para voltar...")
+            input("\nPressione ENTER para voltar...")
         elif opcao == 2:
             limpar_tela()
             listar_tarefas()
+            input("\nPressione ENTER para voltar...")
+        elif opcao == 3:
+            limpar_tela()
+            mudar_estado_tarefa()
             input("\nPressione ENTER para voltar...")
         else:
             limpar_tela()
