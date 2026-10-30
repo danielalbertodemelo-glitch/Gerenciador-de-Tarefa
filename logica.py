@@ -5,11 +5,14 @@ import tempfile
 ficheiro_tarefas = "tarefas.json"
 estados = ["Pendente", "Feito", "Não Feito"]
 estado_inicial = "Pendente"
+dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"]
 
-def criar_tarefa(nome):
+def criar_tarefa(nome, dia, permanente):
     tarefa = {
         "nome": nome,
-        "estado": estado_inicial
+        "estado": estado_inicial,
+        "dia": dia,
+        "permanente": permanente
     }
     return tarefa
 
@@ -25,6 +28,9 @@ def contar_por_estado(tarefas):
         contagem[tarefa["estado"]] += 1
 
     return contagem
+
+def filtrar_tarefas_por_dia(tarefas, dia):
+    return [tarefa for tarefa in tarefas if tarefa.get("dia") == dia]
 
 def guardar_tarefas(tarefas):
     pasta = os.path.dirname(os.path.abspath(ficheiro_tarefas))
@@ -48,7 +54,11 @@ def guardar_tarefas(tarefas):
 def carregar_tarefas():
     try:
         with open(ficheiro_tarefas, "r", encoding="utf-8") as ficheiro:
-            return json.load(ficheiro)
+            tarefas = json.load(ficheiro)
+            for tarefa in tarefas:
+                tarefa.setdefault("dia", None)
+                tarefa.setdefault("permanente", False)
+            return tarefas
     except FileNotFoundError:
         return []
     except (json.JSONDecodeError, UnicodeDecodeError) as erro:

@@ -1,14 +1,30 @@
 import os
 import time
-from logica import criar_tarefa, contar_por_estado, estados, atualizar_estado, guardar_tarefas, carregar_tarefas
+from interface import formatar_marca_permanente
+from logica import (
+    criar_tarefa,
+    contar_por_estado,
+    estados,
+    dias,
+    atualizar_estado,
+    filtrar_tarefas_por_dia,
+    guardar_tarefas,
+    carregar_tarefas
+)
 
 try:
     tarefas = carregar_tarefas()
 except ValueError as erro:
     print(f"Erro ao carregar as tarefas: {erro}")
-    raise SystemExit(1) from erro
+    raise SystemExit(1)
 
-opcoes_menu = ["Adicionar Tarefa", "Listar Tarefas", "Mudar Estado de uma Tarefa", "Sair"]
+opcoes_menu = [
+    "Adicionar Tarefa",
+    "Listar Tarefas",
+    "Mudar Estado de uma Tarefa",
+    "Ver tarefas de um dia",
+    "Sair"
+]
 
 def mostrar_linha():
     print("=" * 40)
@@ -26,6 +42,14 @@ def pedir_opcao(mensagem, quantidade):
         except ValueError:
             print("Digite apenas números.")
 
+def escolher_dia(mensagem):
+    print("\nDias disponíveis:")
+    for i, dia in enumerate(dias, start=1):
+        print(f"[{i}] - {dia}")
+
+    opcao = pedir_opcao(mensagem, len(dias))
+    return dias[opcao - 1]
+
 def adicionar_tarefa():
     mostrar_linha()
     print("\tADICIONAR TAREFA")
@@ -36,10 +60,17 @@ def adicionar_tarefa():
         print("O nome da tarefa não pode ficar vazio.")
         nome = input("Nome da tarefa: ").strip()
 
-    tarefa = criar_tarefa(nome)
+    dia = escolher_dia("Escolha o dia da tarefa")
+
+    print("\nA tarefa é permanente?")
+    print("[1] - Sim")
+    print("[2] - Não")
+    permanente = pedir_opcao("Escolha uma opção", 2) == 1
+
+    tarefa = criar_tarefa(nome, dia, permanente)
     tarefas.append(tarefa)
     guardar_tarefas(tarefas)
-    
+
     print("\nTarefa Adicionada com Sucesso!")
 
 def listar_tarefas():
@@ -53,7 +84,11 @@ def listar_tarefas():
         return
 
     for tarefa in tarefas:
-        print(f"{tarefa['nome']:<20}{tarefa['estado']}")
+        dia = tarefa.get("dia") or "Dia não definido"
+        print(
+            f"{tarefa['nome']:<20}{tarefa['estado']} - {dia}"
+            f"{formatar_marca_permanente(tarefa)}"
+        )
     mostrar_linha()
 
     contagem = contar_por_estado(tarefas)
@@ -83,9 +118,29 @@ def mudar_estado_tarefa():
     opcao_estado = pedir_opcao("Escolha o novo estado", len(estados))
 
     atualizar_estado(tarefas, opcao - 1, estados[opcao_estado - 1])
-    guardar_tarefas (tarefas)
+    guardar_tarefas(tarefas)
 
     print("\nEstado da tarefa atualizado com sucesso!")
+
+def ver_tarefas_de_um_dia():
+    mostrar_linha()
+    print("\tTAREFAS DE UM DIA")
+    mostrar_linha()
+
+    dia = escolher_dia("Escolha o dia que pretende consultar")
+    tarefas_do_dia = filtrar_tarefas_por_dia(tarefas, dia)
+
+    if not tarefas_do_dia:
+        print(f"Não há tarefas cadastradas para {dia}.")
+        mostrar_linha()
+        return
+
+    for tarefa in tarefas_do_dia:
+        print(
+            f"{tarefa['nome']:<20}{tarefa['estado']}"
+            f"{formatar_marca_permanente(tarefa)}"
+        )
+    mostrar_linha()
 
 def menu():
     while True:
@@ -110,6 +165,10 @@ def menu():
         elif opcao == 3:
             limpar_tela()
             mudar_estado_tarefa()
+            input("\nPressione ENTER para voltar...")
+        elif opcao == 4:
+            limpar_tela()
+            ver_tarefas_de_um_dia()
             input("\nPressione ENTER para voltar...")
         else:
             limpar_tela()
