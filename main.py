@@ -1,8 +1,13 @@
 import os
 import time
-from logica import criar_tarefa, contar_por_estado, estados, atualizar_estado
+from logica import criar_tarefa, contar_por_estado, estados, atualizar_estado, guardar_tarefas, carregar_tarefas
 
-tarefas = []
+try:
+    tarefas = carregar_tarefas()
+except ValueError as erro:
+    print(f"Erro ao carregar as tarefas: {erro}")
+    raise SystemExit(1) from erro
+
 opcoes_menu = ["Adicionar Tarefa", "Listar Tarefas", "Mudar Estado de uma Tarefa", "Sair"]
 
 def mostrar_linha():
@@ -33,6 +38,7 @@ def adicionar_tarefa():
 
     tarefa = criar_tarefa(nome)
     tarefas.append(tarefa)
+    guardar_tarefas(tarefas)
     
     print("\nTarefa Adicionada com Sucesso!")
 
@@ -75,7 +81,9 @@ def mudar_estado_tarefa():
         print(f"[{i}] - {estado}")
 
     opcao_estado = pedir_opcao("Escolha o novo estado", len(estados))
+
     atualizar_estado(tarefas, opcao - 1, estados[opcao_estado - 1])
+    guardar_tarefas (tarefas)
 
     print("\nEstado da tarefa atualizado com sucesso!")
 
